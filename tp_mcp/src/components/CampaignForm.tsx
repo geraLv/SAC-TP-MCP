@@ -1,45 +1,51 @@
-import React, { useState } from "react";
-import { useChatStore } from "../store/chat";
+import { useState } from "react";
 
 export default function CampaignForm() {
-  const { send, state } = useChatStore();
   const [producto, setProducto] = useState("");
   const [publico, setPublico] = useState("");
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!producto.trim() || !publico.trim() || state.pending) return;
-    const prompt = `Producto: ${producto}\nPúblico: ${publico}\nGenera 3 tweets, 1 post de LinkedIn profesional y 1 descripción de Instagram con emojis.`;
-    send(prompt, { producto, publico });
-  };
-
   return (
-    <form
-      onSubmit={onSubmit}
-      className="space-y-2 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3"
-    >
-      <div className="font-medium">Crear Campaña</div>
-      <div className="grid gap-2 sm:grid-cols-2">
+    <section className="space-y-4 rounded-3xl border border-red-200/30 bg-zinc-950/70 p-5 shadow-[0px_20px_45px_rgba(0,0,0,0.45)] backdrop-blur">
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-red-200/70">
+          AI EXPRESS
+        </p>
+        <h3 className="text-xl font-semibold text-white">Crear campaña</h3>
+        <p className="text-sm text-zinc-400">
+          maqueta tus ideas acá: completá los campos y guarda tu inspiración.
+        </p>
+      </div>
+
+      <label className="block space-y-1.5">
+        <span className="text-xs uppercase tracking-[0.2em] text-red-100/80">
+          Producto o servicio
+        </span>
         <input
           value={producto}
           onChange={(e) => setProducto(e.target.value)}
-          placeholder="Producto"
-          className="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2"
+          placeholder="Ej: Venta de productos antiguos"
+          className="w-full px-4 py-3 text-sm text-white transition border outline-none rounded-2xl border-red-200/30 bg-white/5 placeholder:text-zinc-500 focus:border-red-400/70 focus:bg-white/10"
         />
+      </label>
+
+      <label className="block space-y-1.5">
+        <span className="text-xs uppercase tracking-[0.2em] text-red-100/80">
+          Público objetivo
+        </span>
         <input
           value={publico}
           onChange={(e) => setPublico(e.target.value)}
-          placeholder="Público objetivo"
-          className="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent px-3 py-2"
+          placeholder="Ej: Coleccionistas/Exóticos"
+          className="w-full px-4 py-3 text-sm text-white transition border outline-none rounded-2xl border-red-200/30 bg-white/5 placeholder:text-zinc-500 focus:border-red-400/70 focus:bg-white/10"
         />
-      </div>
+      </label>
+
       <button
-        type="submit"
-        disabled={state.pending}
-        className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 disabled:opacity-50"
+        type="button"
+        className="w-full rounded-2xl border border-transparent bg-linear-to-r bg-red-700/80 px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-red-900/30 transition hover:from-red-800 hover:to-red-700"
       >
-        Generar y publicar (simulado)
+        Guardar idea (no anda)
       </button>
-    </form>
+    </section>
   );
 }
