@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { getCampaignResults } from "../api/clients";
-import type { CampaignResult } from "../types";
+import { getLatestCampaign } from "../api/clients";
+import type { CampaignRecord } from "../types";
 // @ts-ignore: no type definitions for './Spotlight'
-import { Spotlight } from "./Spotlight"
+import { Spotlight } from "./Spotlight";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -16,7 +16,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export default function CampaignResults() {
-  const [result, setResult] = useState<CampaignResult | null>(null);
+  const [campaign, setCampaign] = useState<CampaignRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,8 +24,8 @@ export default function CampaignResults() {
     try {
       setLoading(true);
       setError(null);
-      const data = await getCampaignResults();
-      setResult(data);
+      const data = await getLatestCampaign("completed");
+      setCampaign(data);
     } catch (err) {
       setError(
         err instanceof Error
@@ -41,6 +41,7 @@ export default function CampaignResults() {
     loadResults();
   }, [loadResults]);
 
+  const result = campaign?.result ?? null;
   const hasResults =
     !!result &&
     (result.tweets?.length ||
@@ -49,8 +50,12 @@ export default function CampaignResults() {
       result.resumen);
 
   return (
-    <Spotlight className="border border-red-200/30 bg-zinc-950/70 p-5 shadow-[0px_20px_45px_rgba(0,0,0,0.45)] backdrop-blur" spotlightColor="rgba(255, 0, 72, 0.22)">
+    <Spotlight
+      className="border border-red-200/30 bg-zinc-950/70 p-5 shadow-[0px_20px_45px_rgba(0,0,0,0.45)] backdrop-blur"
+      spotlightColor="rgba(255, 0, 72, 0.22)"
+    >
       <section className="space-y-4">
+        {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-red-200/70">
@@ -63,6 +68,7 @@ export default function CampaignResults() {
               Apenas termine el flujo en MCP, los posteos aparecerán acá.
             </p>
           </div>
+
           <button
             type="button"
             onClick={loadResults}
@@ -73,41 +79,56 @@ export default function CampaignResults() {
           </button>
         </div>
 
+        {/* Error */}
         {error && (
           <p className="rounded-2xl border border-red-400/60 bg-red-500/10 px-4 py-3 text-xs uppercase tracking-[0.2em] text-red-100">
             {error}
           </p>
         )}
 
-        {!error && !loading && !hasResults && (
+        {/* Nada generado aún */}
+        {!error && !loading && !campaign && (
           <p className="rounded-2xl border border-zinc-500/20 bg-zinc-900/40 px-4 py-3 text-xs uppercase tracking-[0.2em] text-zinc-200">
             Todavía no se guardó ninguna campaña.
           </p>
         )}
 
-        {hasResults && result && (
+        {/* Si hay campaña */}
+        {campaign && (
           <div className="space-y-3">
+            {/* CONTEXTO */}
             <Section title="Contexto">
               <ul className="space-y-1 text-zinc-200">
                 <li>
                   <span className="font-semibold text-white">Producto:</span>{" "}
-                  {result.producto}
+                  {campaign.producto}
                 </li>
                 <li>
-                  <span className="font-semibold text-white">
-                    Público objetivo:
-                  </span>{" "}
-                  {result.publico_objetivo}
+                  <span className="font-semibold text-white">Público objetivo:</span>{" "}
+                  {campaign.publico_objetivo}
                 </li>
-                {result.generated_at && (
+                <li>
+                  <span className="font-semibold text-white">Estado:</span>{" "}
+                  {campaign.status.toUpperCase()}
+                </li>
+                {campaign.updated_at && (
                   <li className="text-xs text-zinc-400">
-                    Generado: {new Date(result.generated_at).toLocaleString()}
+                    Última actualización:{" "}
+                    {new Date(campaign.updated_at).toLocaleString()}
                   </li>
                 )}
               </ul>
             </Section>
 
-            {result.tweets?.length ? (
+            {/* Si no hay resultados */}
+            {!hasResults && (
+              <p className="rounded-2xl border border-zinc-500/20 bg-zinc-900/40 px-4 py-3 text-xs uppercase tracking-[0.2em] text-zinc-200">
+                Estamos esperando los resultados del agente…
+              </p>
+            )}
+
+            {/* HILO DE TWEETS */}
+            {hasResults && result?.tweets?.length ? (
               <Section title="Hilo de tweets">
                 <ol className="space-y-2 list-decimal list-inside text-zinc-100">
                   {result.tweets.map((tweet, idx) => (
@@ -119,19 +140,22 @@ export default function CampaignResults() {
               </Section>
             ) : null}
 
-            {result.linkedin_post ? (
+            {/* LINKEDIN */}
+            {hasResults && result?.linkedin_post ? (
               <Section title="Post de LinkedIn">
                 <p className="whitespace-pre-wrap">{result.linkedin_post}</p>
               </Section>
             ) : null}
 
-            {result.instagram_post ? (
+            {/* INSTAGRAM */}
+            {hasResults && result?.instagram_post ? (
               <Section title="Descripción de Instagram">
                 <p className="whitespace-pre-wrap">{result.instagram_post}</p>
               </Section>
             ) : null}
 
-            {result.resumen ? (
+            {/* RESUMEN */}
+            {hasResults && result?.resumen ? (
               <Section title="Resumen del agente">
                 <p className="whitespace-pre-wrap text-zinc-200">
                   {result.resumen}

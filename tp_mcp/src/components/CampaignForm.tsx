@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { getCampaignData, saveCampaignData } from "../api/clients";
+import { createCampaign, getLatestCampaign } from "../api/clients";
+import type { CampaignRecord } from "../types";
 // @ts-ignore: no type definitions for './Spotlight'
-import { Spotlight } from "./Spotlight"
+import { Spotlight } from "./Spotlight";
 
 type Feedback =
   | { type: "success"; message: string }
@@ -15,20 +16,25 @@ export default function CampaignForm() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [lastCampaign, setLastCampaign] = useState<CampaignRecord | null>(null);
 
   useEffect(() => {
     let active = true;
+
     (async () => {
       try {
         setLoading(true);
-        const data = await getCampaignData();
+        const latest = await getLatestCampaign();
         if (!active) return;
-        if (data) {
-          setProducto(data.producto ?? "");
-          setPublico(data.publico_objetivo ?? "");
+
+        if (latest) {
+          setLastCampaign(latest);
+          setProducto(latest.producto ?? "");
+          setPublico(latest.publico_objetivo ?? "");
           setFeedback({
             type: "info",
-            message: "Datos recuperados del endpoint.",
+            message:
+              "Última campaña recuperada. Podés reutilizarla o crear una nueva.",
           });
         } else {
           setFeedback({
@@ -49,6 +55,7 @@ export default function CampaignForm() {
         if (active) setLoading(false);
       }
     })();
+
     return () => {
       active = false;
     };
@@ -81,16 +88,16 @@ export default function CampaignForm() {
     setFeedback(null);
 
     try {
-      const saved = await saveCampaignData({
+      const record = await createCampaign({
         producto: producto.trim(),
         publico_objetivo: publico.trim(),
       });
 
-      setProducto(saved.producto);
-      setPublico(saved.publico_objetivo);
+      setLastCampaign(record);
       setFeedback({
         type: "success",
-        message: "Datos enviados. El agente ya puede consumirlos.",
+        message:
+          "Campaña enviada. En breve verás el resultado en el panel inferior.",
       });
     } catch (error) {
       setFeedback({
@@ -106,7 +113,10 @@ export default function CampaignForm() {
   };
 
   return (
-    <Spotlight className="border border-red-200/30 bg-zinc-950/70 p-5 shadow-[0px_20px_45px_rgba(0,0,0,0.45)] backdrop-blur" spotlightColor="rgba(255, 0, 72, 0.22)">
+    <Spotlight
+      className="border border-red-200/30 bg-zinc-950/70 p-5 shadow-[0px_20px_45px_rgba(0,0,0,0.45)] backdrop-blur"
+      spotlightColor="rgba(255, 0, 72, 0.22)"
+    >
       <section className="space-y-4">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-red-200/70">
@@ -114,10 +124,16 @@ export default function CampaignForm() {
           </p>
           <h3 className="text-xl font-semibold text-white">Crear campaña</h3>
           <p className="text-sm text-zinc-400">
-            Definí el producto y tu público objetivo; el agente los leerá directo
-            desde el endpoint al iniciar la campaña.
+            Definí el producto y tu público objetivo; el servicio lo enviará al
+            agente y guardará todo en MongoDB.
           </p>
         </div>
+
+        {lastCampaign && (
+          <p className="rounded-2xl border border-zinc-500/30 bg-zinc-900/50 px-4 py-3 text-xs uppercase tracking-[0.2em] text-zinc-100">
+            Último estado: {lastCampaign.status.toUpperCase()}
+          </p>
+        )}
 
         <label className="block space-y-1.5">
           <span className="text-xs uppercase tracking-[0.2em] text-red-100/80">
@@ -153,9 +169,10 @@ export default function CampaignForm() {
             buttonDisabled ? "opacity-60 cursor-not-allowed" : ""
           }`}
         >
-          {saving ? "Guardando..." : "Guardar para el agente"}
+          {saving ? "Guardando..." : "Enviar campaña"}
         </button>
 
+        {/* FEEDBACK */}
         {feedback && (
           <p
             className={`rounded-2xl border px-4 py-3 text-xs uppercase tracking-[0.2em] ${feedbackClasses}`}
