@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getCampaignData, saveCampaignData } from "../api/clients";
+// @ts-ignore: no type definitions for './Spotlight'
+import { Spotlight } from "./Spotlight"
 
 type Feedback =
   | { type: "success"; message: string }
@@ -104,63 +106,65 @@ export default function CampaignForm() {
   };
 
   return (
-    <section className="h-10/12 space-y-4 rounded-3xl border border-red-200/30 bg-zinc-950/70 p-5 shadow-[0px_20px_45px_rgba(0,0,0,0.45)] backdrop-blur">
-      <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-red-200/70">
-          AI EXPRESS
-        </p>
-        <h3 className="text-xl font-semibold text-white">Crear campaña</h3>
-        <p className="text-sm text-zinc-400">
-          Definí el producto y tu público objetivo; el agente los leerá directo
-          desde el endpoint al iniciar la campaña.
-        </p>
-      </div>
+    <Spotlight className="border border-red-200/30 bg-zinc-950/70 p-5 shadow-[0px_20px_45px_rgba(0,0,0,0.45)] backdrop-blur" spotlightColor="rgba(255, 0, 72, 0.22)">
+      <section className="space-y-4">
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-red-200/70">
+            AI EXPRESS
+          </p>
+          <h3 className="text-xl font-semibold text-white">Crear campaña</h3>
+          <p className="text-sm text-zinc-400">
+            Definí el producto y tu público objetivo; el agente los leerá directo
+            desde el endpoint al iniciar la campaña.
+          </p>
+        </div>
 
-      <label className="block space-y-1.5">
-        <span className="text-xs uppercase tracking-[0.2em] text-red-100/80">
-          Producto o servicio
-        </span>
-        <input
-          value={producto}
-          onChange={(e) => setProducto(e.target.value)}
-          placeholder="Ej: Venta de productos antiguos"
-          className="w-full px-4 py-3 text-sm text-white transition border outline-none rounded-2xl border-red-200/30 bg-white/5 placeholder:text-zinc-500 focus:border-red-400/70 focus:bg-white/10"
-          disabled={loading}
-        />
-      </label>
+        <label className="block space-y-1.5">
+          <span className="text-xs uppercase tracking-[0.2em] text-red-100/80">
+            Producto o servicio
+          </span>
+          <input
+            value={producto}
+            onChange={(e) => setProducto(e.target.value)}
+            placeholder="Ej: Venta de productos antiguos"
+            className="w-full px-4 py-3 text-sm text-white transition border outline-none rounded-2xl border-red-200/30 bg-white/5 placeholder:text-zinc-500 focus:border-red-400/70 focus:bg-white/10"
+            disabled={loading}
+          />
+        </label>
 
-      <label className="block space-y-1.5">
-        <span className="text-xs uppercase tracking-[0.2em] text-red-100/80">
-          Público objetivo
-        </span>
-        <input
-          value={publico}
-          onChange={(e) => setPublico(e.target.value)}
-          placeholder="Ej: Coleccionistas/Exóticos"
-          className="w-full px-4 py-3 text-sm text-white transition border outline-none rounded-2xl border-red-200/30 bg-white/5 placeholder:text-zinc-500 focus:border-red-400/70 focus:bg-white/10"
-          disabled={loading}
-        />
-      </label>
+        <label className="block space-y-1.5">
+          <span className="text-xs uppercase tracking-[0.2em] text-red-100/80">
+            Público objetivo
+          </span>
+          <input
+            value={publico}
+            onChange={(e) => setPublico(e.target.value)}
+            placeholder="Ej: Coleccionistas/Exóticos"
+            className="w-full px-4 py-3 text-sm text-white transition border outline-none rounded-2xl border-red-200/30 bg-white/5 placeholder:text-zinc-500 focus:border-red-400/70 focus:bg-white/10"
+            disabled={loading}
+          />
+        </label>
 
-      <button
-        type="button"
-        onClick={handleSave}
-        disabled={buttonDisabled}
-        className={`w-full rounded-2xl border border-transparent bg-linear-to-r bg-red-700/80 px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-red-900/30 transition hover:from-red-800 hover:to-red-700 ${
-          buttonDisabled ? "opacity-60 cursor-not-allowed" : ""
-        }`}
-      >
-        {saving ? "Guardando..." : "Guardar para el agente"}
-      </button>
-
-      {feedback && (
-        <p
-          className={`rounded-2xl border px-4 py-3 text-xs uppercase tracking-[0.2em] ${feedbackClasses}`}
-          role={feedback.type === "error" ? "alert" : undefined}
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={buttonDisabled}
+          className={`w-full rounded-2xl border bg-linear-to-r cursor-pointer border-red-400/60 bg-zinc-950/70 hover:bg-red-500/10 px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white hover:shadow-lg hover:shadow-red-900/30 transition ${
+            buttonDisabled ? "opacity-60 cursor-not-allowed" : ""
+          }`}
         >
-          {feedback.message}
-        </p>
-      )}
-    </section>
+          {saving ? "Guardando..." : "Guardar para el agente"}
+        </button>
+
+        {feedback && (
+          <p
+            className={`rounded-2xl border px-4 py-3 text-xs uppercase tracking-[0.2em] ${feedbackClasses}`}
+            role={feedback.type === "error" ? "alert" : undefined}
+          >
+            {feedback.message}
+          </p>
+        )}
+      </section>
+    </Spotlight>
   );
 }

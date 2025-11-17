@@ -69,7 +69,7 @@ export default function ChatWindow() {
           <button
             type="submit"
             disabled={state.pending}
-            className="px-5 py-3 text-sm font-semibold tracking-wide text-white uppercase transition border border-transparent rounded-2xl bg-red-600/80 hover:bg-red-700/80"
+            className="px-5 py-3 text-sm font-semibold tracking-wide text-white uppercase transition border border-transparent cursor-pointer rounded-2xl bg-red-600/80 hover:bg-red-700/80"
           >
             Enviar
           </button>
