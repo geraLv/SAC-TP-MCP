@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { getCampaignResults } from "../api/clients";
-import type { CampaignResult } from "../types";
+import { getLatestCampaign } from "../api/clients";
+import type { CampaignRecord } from "../types";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -14,7 +14,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export default function CampaignResults() {
-  const [result, setResult] = useState<CampaignResult | null>(null);
+  const [campaign, setCampaign] = useState<CampaignRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,8 +22,8 @@ export default function CampaignResults() {
     try {
       setLoading(true);
       setError(null);
-      const data = await getCampaignResults();
-      setResult(data);
+      const data = await getLatestCampaign("completed");
+      setCampaign(data);
     } catch (err) {
       setError(
         err instanceof Error
@@ -39,6 +39,7 @@ export default function CampaignResults() {
     loadResults();
   }, [loadResults]);
 
+  const result = campaign?.result ?? null;
   const hasResults =
     !!result &&
     (result.tweets?.length ||
@@ -76,35 +77,46 @@ export default function CampaignResults() {
         </p>
       )}
 
-      {!error && !loading && !hasResults && (
+      {!error && !loading && !campaign && (
         <p className="rounded-2xl border border-zinc-500/20 bg-zinc-900/40 px-4 py-3 text-xs uppercase tracking-[0.2em] text-zinc-200">
           Todavía no se guardó ninguna campaña.
         </p>
       )}
 
-      {hasResults && result && (
+      {campaign && (
         <div className="space-y-3">
           <Section title="Contexto">
             <ul className="space-y-1 text-zinc-200">
               <li>
                 <span className="font-semibold text-white">Producto:</span>{" "}
-                {result.producto}
+                {campaign.producto}
               </li>
               <li>
                 <span className="font-semibold text-white">
                   Público objetivo:
                 </span>{" "}
-                {result.publico_objetivo}
+                {campaign.publico_objetivo}
               </li>
-              {result.generated_at && (
+              <li>
+                <span className="font-semibold text-white">Estado:</span>{" "}
+                {campaign.status.toUpperCase()}
+              </li>
+              {campaign.updated_at && (
                 <li className="text-xs text-zinc-400">
-                  Generado: {new Date(result.generated_at).toLocaleString()}
+                  Última actualización:{" "}
+                  {new Date(campaign.updated_at).toLocaleString()}
                 </li>
               )}
             </ul>
           </Section>
 
-          {result.tweets?.length ? (
+          {!hasResults && (
+            <p className="rounded-2xl border border-zinc-500/20 bg-zinc-900/40 px-4 py-3 text-xs uppercase tracking-[0.2em] text-zinc-200">
+              Estamos esperando los resultados del agente…
+            </p>
+          )}
+
+          {hasResults && result?.tweets?.length ? (
             <Section title="Hilo de tweets">
               <ol className="space-y-2 list-decimal list-inside text-zinc-100">
                 {result.tweets.map((tweet, idx) => (
@@ -116,19 +128,19 @@ export default function CampaignResults() {
             </Section>
           ) : null}
 
-          {result.linkedin_post ? (
+          {hasResults && result?.linkedin_post ? (
             <Section title="Post de LinkedIn">
               <p className="whitespace-pre-wrap">{result.linkedin_post}</p>
             </Section>
           ) : null}
 
-          {result.instagram_post ? (
+          {hasResults && result?.instagram_post ? (
             <Section title="Descripción de Instagram">
               <p className="whitespace-pre-wrap">{result.instagram_post}</p>
             </Section>
           ) : null}
 
-          {result.resumen ? (
+          {hasResults && result?.resumen ? (
             <Section title="Resumen del agente">
               <p className="whitespace-pre-wrap text-zinc-200">
                 {result.resumen}

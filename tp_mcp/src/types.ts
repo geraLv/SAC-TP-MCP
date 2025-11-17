@@ -13,16 +13,6 @@ export interface ChatState {
   error?: string | null;
 }
 
-export interface CampaignInput {
-  producto: string;
-  publico: string;
-}
-
-export interface CampaignData {
-  producto: string;
-  publico_objetivo: string;
-}
-
 export interface CampaignResult {
   producto: string;
   publico_objetivo: string;
@@ -31,6 +21,22 @@ export interface CampaignResult {
   instagram_post?: string | null;
   resumen?: string | null;
   generated_at?: string | null;
+}
+
+export interface CampaignRecord {
+  id: string;
+  producto: string;
+  publico_objetivo: string;
+  status: "pending" | "completed" | "failed";
+  created_at: string;
+  updated_at: string;
+  result?: CampaignResult | null;
+  error?: string | null;
+}
+
+export interface CampaignPayload {
+  producto: string;
+  publico_objetivo: string;
 }
 
 export interface ChatRequestBody {
