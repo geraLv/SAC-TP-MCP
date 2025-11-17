@@ -48,7 +48,9 @@ export default function CampaignHistory() {
           <p className="text-xs uppercase tracking-[0.3em] text-red-200/70">
             Historial
           </p>
-          <h3 className="text-xl font-semibold text-white">Campañas guardadas</h3>
+          <h3 className="text-xl font-semibold text-white">
+            Campañas guardadas
+          </h3>
           <p className="text-sm text-zinc-400">
             Expandí una campaña para ver todo lo generado por el agente.
           </p>
@@ -79,7 +81,9 @@ export default function CampaignHistory() {
         {campaigns.map((campaign) => {
           const isOpen = openId === campaign.id;
           const toggle = () =>
-            setOpenId((current) => (current === campaign.id ? null : campaign.id));
+            setOpenId((current) =>
+              current === campaign.id ? null : campaign.id
+            );
           const result = campaign.result;
           return (
             <div
@@ -94,7 +98,8 @@ export default function CampaignHistory() {
                 <div>
                   <p className="font-semibold">{campaign.producto}</p>
                   <p className="text-xs text-zinc-400">
-                    {campaign.publico_objetivo} — {campaign.status.toUpperCase()}
+                    {campaign.publico_objetivo} —{" "}
+                    {campaign.status.toUpperCase()}
                   </p>
                 </div>
                 <span
@@ -157,7 +162,9 @@ export default function CampaignHistory() {
                           <p className="text-xs uppercase tracking-[0.3em] text-red-200/70">
                             Resumen del agente
                           </p>
-                          <p className="whitespace-pre-wrap">{result.resumen}</p>
+                          <p className="whitespace-pre-wrap">
+                            {result.resumen}
+                          </p>
                         </div>
                       )}
                     </>

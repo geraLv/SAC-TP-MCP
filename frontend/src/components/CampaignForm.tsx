@@ -10,7 +10,11 @@ type Feedback =
   | { type: "info"; message: string }
   | null;
 
-export default function CampaignForm() {
+type CampaignFormProps = {
+  onSubmitted?: () => void;
+};
+
+export default function CampaignForm({ onSubmitted }: CampaignFormProps) {
   const [producto, setProducto] = useState("");
   const [publico, setPublico] = useState("");
   const [loading, setLoading] = useState(true);
@@ -34,12 +38,12 @@ export default function CampaignForm() {
           setFeedback({
             type: "info",
             message:
-              "Última campaña recuperada. Podés reutilizarla o crear una nueva.",
+              "Ultima campana recuperada. Podes reutilizarla o crear una nueva.",
           });
         } else {
           setFeedback({
             type: "info",
-            message: "Guardá tu primera campaña para que el agente la use.",
+            message: "Guarda tu primera campana para que el agente la use.",
           });
         }
       } catch (error) {
@@ -79,7 +83,7 @@ export default function CampaignForm() {
     if (!producto.trim() || !publico.trim()) {
       setFeedback({
         type: "error",
-        message: "Completá los campos antes de guardar.",
+        message: "Completa los campos antes de guardar.",
       });
       return;
     }
@@ -97,15 +101,16 @@ export default function CampaignForm() {
       setFeedback({
         type: "success",
         message:
-          "Campaña enviada. En breve verás el resultado en el panel inferior.",
+          "Campana enviada. En breve veras el resultado en el panel inferior.",
       });
+      onSubmitted?.();
     } catch (error) {
       setFeedback({
         type: "error",
         message:
           error instanceof Error
             ? error.message
-            : "No pudimos guardar la campaña.",
+            : "No pudimos guardar la campana.",
       });
     } finally {
       setSaving(false);
@@ -122,16 +127,16 @@ export default function CampaignForm() {
           <p className="text-xs uppercase tracking-[0.3em] text-red-200/70">
             AI EXPRESS
           </p>
-          <h3 className="text-xl font-semibold text-white">Crear campaña</h3>
+          <h3 className="text-xl font-semibold text-white">Crear campana</h3>
           <p className="text-sm text-zinc-400">
-            Definí el producto y tu público objetivo; el servicio lo enviará al
-            agente y guardará todo en MongoDB.
+            Define el producto y tu publico objetivo; el servicio lo enviara al
+            agente y guardara todo en MongoDB.
           </p>
         </div>
 
         {lastCampaign && (
           <p className="rounded-2xl border border-zinc-500/30 bg-zinc-900/50 px-4 py-3 text-xs uppercase tracking-[0.2em] text-zinc-100">
-            Último estado: {lastCampaign.status.toUpperCase()}
+            Ultimo estado: {lastCampaign.status.toUpperCase()}
           </p>
         )}
 
@@ -150,12 +155,12 @@ export default function CampaignForm() {
 
         <label className="block space-y-1.5">
           <span className="text-xs uppercase tracking-[0.2em] text-red-100/80">
-            Público objetivo
+            Publico objetivo
           </span>
           <input
             value={publico}
             onChange={(e) => setPublico(e.target.value)}
-            placeholder="Ej: Coleccionistas/Exóticos"
+            placeholder="Ej: Coleccionistas/Exoticos"
             className="w-full px-4 py-3 text-sm text-white transition border outline-none rounded-2xl border-red-200/30 bg-white/5 placeholder:text-zinc-500 focus:border-red-400/70 focus:bg-white/10"
             disabled={loading}
           />
@@ -169,10 +174,9 @@ export default function CampaignForm() {
             buttonDisabled ? "opacity-60 cursor-not-allowed" : ""
           }`}
         >
-          {saving ? "Guardando..." : "Enviar campaña"}
+          {saving ? "Guardando..." : "Enviar campana"}
         </button>
 
-        {/* FEEDBACK */}
         {feedback && (
           <p
             className={`rounded-2xl border px-4 py-3 text-xs uppercase tracking-[0.2em] ${feedbackClasses}`}
