@@ -1,0 +1,8 @@
+mcp[cli]
+python-dotenv
+langchain>=0.2.0
+langchain-core>=0.2.0
+langchain-google-genai>=1.0.4
+langchain-mcp-adapters>=0.0.5
+fastapi>=0.110.0
+uvicorn[standard]>=0.30.0
